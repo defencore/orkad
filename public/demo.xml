@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openrocket version="1.10" creator="ORKAD example">
+  <rocket>
+    <name>Aster 01</name>
+    <subcomponents>
+      <stage>
+        <name>Sustainer</name>
+        <subcomponents>
+          <nosecone>
+            <name>Ogive nose cone</name>
+            <length>0.190</length>
+            <thickness>0.002</thickness>
+            <shape>ogive</shape>
+            <shapeparameter>1.0</shapeparameter>
+            <aftradius>auto</aftradius>
+            <aftshoulderradius>0.0255</aftshoulderradius>
+            <aftshoulderlength>0.038</aftshoulderlength>
+            <aftshoulderthickness>0.002</aftshoulderthickness>
+            <aftshouldercapped>false</aftshouldercapped>
+            <material type="bulk" density="1240">PLA</material>
+            <color red="231" green="104" blue="54"/>
+          </nosecone>
+          <bodytube>
+            <name>Airframe</name>
+            <length>0.450</length>
+            <radius>0.027</radius>
+            <thickness>0.0015</thickness>
+            <material type="bulk" density="680">Cardboard</material>
+            <color red="223" green="229" blue="231"/>
+            <subcomponents>
+              <tubecoupler>
+                <name>Airframe coupler</name>
+                <length>0.070</length>
+                <outerradius>0.0255</outerradius>
+                <thickness>0.0015</thickness>
+                <axialoffset method="bottom">0.035</axialoffset>
+              </tubecoupler>
+            </subcomponents>
+          </bodytube>
+          <bodytube>
+            <name>Fin can</name>
+            <length>0.260</length>
+            <radius>0.027</radius>
+            <thickness>0.0015</thickness>
+            <color red="165" green="177" blue="184"/>
+            <subcomponents>
+              <trapezoidfinset>
+                <name>Swept fin</name>
+                <fincount>3</fincount>
+                <rotation>30</rotation>
+                <thickness>0.003</thickness>
+                <rootchord>0.155</rootchord>
+                <tipchord>0.065</tipchord>
+                <sweeplength>0.065</sweeplength>
+                <height>0.080</height>
+                <crosssection>square</crosssection>
+                <axialoffset method="bottom">-0.015</axialoffset>
+                <material type="bulk" density="600">Birch plywood</material>
+              </trapezoidfinset>
+              <innertube>
+                <name>Motor mount tube</name>
+                <length>0.180</length>
+                <outerradius>0.0155</outerradius>
+                <thickness>0.001</thickness>
+                <axialoffset method="bottom">0</axialoffset>
+              </innertube>
+              <centeringring>
+                <name>Forward centering ring</name>
+                <length>0.004</length>
+                <outerradius>0.0255</outerradius>
+                <innerradius>0.0155</innerradius>
+                <axialoffset method="bottom">-0.160</axialoffset>
+              </centeringring>
+              <centeringring>
+                <name>Aft centering ring</name>
+                <length>0.004</length>
+                <outerradius>0.0255</outerradius>
+                <innerradius>0.0155</innerradius>
+                <axialoffset method="bottom">-0.010</axialoffset>
+              </centeringring>
+              <launchlug>
+                <name>Launch lug</name>
+                <length>0.035</length>
+                <radius>0.0035</radius>
+                <thickness>0.001</thickness>
+                <radialdirection>90</radialdirection>
+                <axialoffset method="top">0.025</axialoffset>
+              </launchlug>
+            </subcomponents>
+          </bodytube>
+        </subcomponents>
+      </stage>
+    </subcomponents>
+  </rocket>
+</openrocket>
