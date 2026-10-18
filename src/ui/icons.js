@@ -1,0 +1,25 @@
+const icons = {
+  upload: '<path d="M12 16V4m-4 4 4-4 4 4M4 16v4h16v-4"/>',
+  download: '<path d="M12 4v12m-4-4 4 4 4-4M4 16v4h16v-4"/>',
+  cube: '<path d="m12 3 9 5v8l-9 5-9-5V8l9-5Zm0 9 9-4M12 12 3 8m9 4v9"/>',
+  code: '<path d="m8 7-5 5 5 5m8-10 5 5-5 5m-3-13-2 16"/>',
+  check: '<path d="m5 12 4 4L19 6"/>',
+  chevron: '<path d="m9 5 7 7-7 7"/>',
+  eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  eyeOff: '<path d="m3 3 18 18M10 5a12 12 0 0 1 12 7s-1 2-3 4M6 6a19 19 0 0 0-4 6s4 7 10 7c2 0 4-1 5-2"/>',
+  fit: '<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/><path d="m8 8 8 8m0-8-8 8"/>',
+  rotate: '<path d="M4 8a9 9 0 1 1 0 9m0-9V3m0 5h5"/>',
+  arrow: '<path d="M4 12h16m-6-6 6 6-6 6"/>',
+  copy: '<rect x="8" y="8" width="12" height="13" rx="2"/><path d="M15 8V3H3v13h5"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/>',
+  close: '<path d="m6 6 12 12M6 18 18 6"/>',
+  file: '<path d="M14 3H5v18h14V8l-5-5Zm0 0v5h5M8 12h8m-8 4h5"/>',
+  lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  external: '<path d="M14 3h7v7m0-7L10 14M10 3H3v18h18v-7"/>',
+  cone: '<path d="M12 3 3 19c0 3 18 3 18 0L12 3Z"/><path d="M3 19c0-3 18-3 18 0"/>',
+  ring: '<ellipse cx="12" cy="12" rx="9" ry="5"/><ellipse cx="12" cy="12" rx="4" ry="2"/>',
+  fin: '<path d="m3 21 4-17 10 7 4 10H3Z"/>',
+  folder: '<path d="M3 6h7l2 3h9v12H3V6Z"/>',
+};
+export const icon = (name, cls = '') =>
+  `<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.cube}</svg>`;

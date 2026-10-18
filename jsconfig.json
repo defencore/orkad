@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "checkJs": true,
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": [
+    "src/config.js",
+    "src/geometry.js",
+    "src/stl.js",
+    "src/cad/client.js",
+    "src/import/archive.js",
+    "src/import/controller.js"
+  ]
+}

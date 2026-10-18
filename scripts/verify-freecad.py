@@ -1,4 +1,4 @@
-"""Verify browser exports using FreeCAD's bundled Python interpreter."""
+"""Verify native FreeCAD projects and browser CAD exports with FreeCAD's Python."""
 import json
 import pathlib
 import FreeCAD as App
@@ -6,40 +6,79 @@ import Part
 import Mesh
 import Import
 
-_project_root = pathlib.Path(__file__).resolve().parents[1]
-_output = _project_root / "test-results" / "workspace-inspect-a-design-f81ae--export-validated-CAD-files"
-_step_path = _output / "assembly.step"
-_stl_path = _output / "nose.stl"
-_python_path = _output / "generated_freecad.py"
-for _path in (_step_path, _stl_path, _python_path):
-    if not _path.exists():
-        raise FileNotFoundError("Run the browser tests first: " + str(_path))
 
-_test_shape = Part.Shape()
-_test_shape.read(str(_step_path))
-_test_step_volumes = [solid.Volume for solid in _test_shape.Solids]
-assert len(_test_step_volumes) == 11
-assert all(solid.isValid() and solid.Volume > 0 for solid in _test_shape.Solids)
+def verify_projects(output):
+    manifest = json.loads((output / "manifest.json").read_text())
+    namespace = {"shape": "user shape", "part": "user part"}
+    for case in manifest:
+        script = (output / case["script"]).read_text()
+        exec("exec(" + json.dumps(script) + ")", namespace)
+        project = namespace["_orkad_project"]
+        assert namespace["shape"] == "user shape" and namespace["part"] == "user part"
+        assert len(project.shapes) == len(case["volumes"]), case["name"]
+        assert len(project.groups) == case["nodes"], case["name"]
+        for shape, reference in zip(project.shapes, case["volumes"]):
+            assert shape.isValid() and len(shape.Solids) == 1 and shape.Volume > 0, case["name"]
+            assert abs(shape.Volume - reference) / reference < 0.0001, case["name"]
+        if case["name"] == "ogive-hollow":
+            project.export_nose_stl(str(output / "native-nose.stl"))
+            mesh = Mesh.Mesh(str(output / "native-nose.stl"))
+            assert mesh.isSolid() and mesh.Volume > 0
+            for index in (-1, len(project.noses), 0.5, True):
+                try:
+                    project.export_nose_stl(str(output / "invalid.stl"), index=index)
+                    raise AssertionError("Invalid nose index was accepted")
+                except ValueError:
+                    pass
+        if case["name"] == "demo.xml":
+            saved_export = namespace["orkad_export_step"]
+            saved_project = project
+            continue
+        if case["name"] == "triad-heavy.xml":
+            saved_export(str(output / "bound-first-project.step"))
+            shape = Part.Shape()
+            shape.read(str(output / "bound-first-project.step"))
+            assert len(shape.Solids) == 11, "A saved helper must retain its original project"
+            project.export_step(str(output / "native-heavy.step"))
+            App.closeDocument(saved_project.document.Name)
+            try:
+                saved_export(str(output / "closed-project.step"))
+                raise AssertionError("A closed document export was accepted")
+            except ValueError:
+                pass
+        App.closeDocument(project.document.Name)
+        print("PASS native project: " + case["name"])
+    print("PASS: " + str(len(manifest)) + " native FreeCAD geometry configurations")
 
-_test_import_doc = App.newDocument("ORKAD_RoundTrip")
-Import.insert(str(_step_path), _test_import_doc.Name)
-_test_labels = [obj.Label for obj in _test_import_doc.Objects]
-assert "Sustainer" in _test_labels
-assert "Ogive nose cone" in _test_labels
-assert any(obj.TypeId == "App::Part" and len(obj.Group) > 1 for obj in _test_import_doc.Objects)
-App.closeDocument(_test_import_doc.Name)
 
-_test_mesh = Mesh.Mesh(str(_stl_path))
-assert _test_mesh.isSolid(), "The exported nose STL must be a closed solid"
-assert _test_mesh.Volume > 0
+def verify_browser(output):
+    candidates = list(output.glob("*/generated_freecad.py"))
+    if len(candidates) != 1:
+        raise FileNotFoundError("Run the browser tests first; expected one generated_freecad.py")
+    directory = candidates[0].parent
+    step = Part.Shape()
+    step.read(str(directory / "assembly.step"))
+    assert len(step.Solids) == 11
+    assert all(solid.isValid() and solid.Volume > 0 for solid in step.Solids)
+    document = App.newDocument("ORKAD_RoundTrip")
+    Import.insert(str(directory / "assembly.step"), document.Name)
+    labels = [obj.Label for obj in document.Objects]
+    assert "Sustainer" in labels and "Ogive nose cone" in labels
+    assert any(obj.TypeId == "App::Part" and len(obj.Group) > 1 for obj in document.Objects)
+    App.closeDocument(document.Name)
+    mesh = Mesh.Mesh(str(directory / "nose.stl"))
+    assert mesh.isSolid() and mesh.Volume > 0
+    namespace = {}
+    exec("exec(" + json.dumps(candidates[0].read_text()) + ")", namespace)
+    project = namespace["_orkad_project"]
+    assert len(project.shapes) == 11
+    assert abs(mesh.Volume - project.noses[0].Shape.Volume) / mesh.Volume < 0.002
+    assert abs(step.Volume - sum(shape.Volume for shape in project.shapes)) / step.Volume < 0.0001
+    App.closeDocument(project.document.Name)
+    print("PASS: browser STEP hierarchy, STL topology, console execution and volume agreement")
 
-# Exercise the one-line console entry point, including its string escaping.
-_test_console = "exec(" + json.dumps(_python_path.read_text()) + ")"
-exec(_test_console)
-assert len(_orkad_shapes) == 11
-assert all(solid.isValid() and len(solid.Solids) == 1 for solid in _orkad_shapes)
-assert abs(_test_mesh.Volume - _orkad_noses[0].Shape.Volume) / _test_mesh.Volume < 0.002
-_test_step_volume = sum(_test_step_volumes)
-assert abs(_test_step_volume - sum(solid.Volume for solid in _orkad_shapes)) / _test_step_volume < 0.0001
-print("PASS: STEP hierarchy, 11 valid solids, closed STL, console execution and volume agreement")
-App.closeDocument(_orkad_doc.Name)
+
+if __name__ == "__main__":
+    results = pathlib.Path(__file__).resolve().parents[1] / "test-results"
+    verify_projects(results / "native")
+    verify_browser(results)
